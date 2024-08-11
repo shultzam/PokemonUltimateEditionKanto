@@ -1,4 +1,4 @@
-local gymButtonPos = {-8.3, 0, 10.6}
+local gymButtonPos = {-7.1, 0, 10.7}
 
 local gymData = nil
 local pokemonData = nil
@@ -10,7 +10,6 @@ function onSave()
 end
 
 function onLoad(saved_data)
-  --saved_data = ""
   if saved_data ~= "" then
       local loaded_data = JSON.decode(saved_data)
       if loaded_data.saveGymData ~= nil and loaded_data.savePokemonData ~= nil then
@@ -47,7 +46,8 @@ function battle()
   if sentToArena then
     self.editButton({
         index=0, label="-", click_function="recall",
-        function_owner=self, tooltip="Recall Gym Leader"
+        function_owner=self, tooltip="Recall Gym Leader",
+        position= gymButtonPos, rotation={0,0,0}, height=800, width=800, font_size=20000
     })
   end
 end
@@ -63,7 +63,8 @@ function recall()
 
   self.editButton({ --Apply settings button
       index=0, label="+", click_function="battle",
-      function_owner=self, tooltip="Start Gym Battle"
+      function_owner=self, tooltip="Start Gym Battle",
+      position= gymButtonPos, rotation={0,0,0}, height=800, width=800, font_size=20000
   })
 end
 

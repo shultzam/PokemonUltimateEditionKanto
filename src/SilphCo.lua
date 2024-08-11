@@ -1,43 +1,48 @@
-local gymButtonPos = {-7.2, 0, 17.4}
+local gymButtonPos = {0, 0, 6.4}
 
-local gymData = nil
-local pokemonData = nil
 local battleManager = "de7152"
+local leadersData = {}
 
 function onSave()
-    saved_data = JSON.encode({saveGymData=gymData, savePokemonData=pokemonData})
+    saved_data = JSON.encode({saveLeadersData=leadersData})
     return saved_data
 end
 
 function onLoad(saved_data)
   if saved_data ~= "" then
       local loaded_data = JSON.decode(saved_data)
-      if loaded_data.saveGymData ~= nil and loaded_data.savePokemonData ~= nil then
-        gymData = copyTable(loaded_data.saveGymData)
-        pokemonData = copyTable(loaded_data.savePokemonData)
+      if loaded_data.saveLeadersData ~= nil then
+          leadersData = copyTable(loaded_data.saveLeadersData)
       end
   end
 
   self.createButton({ --Apply settings button
       label="+", click_function="battle",
-      function_owner=self, tooltip="Start Gym Battle",
+      function_owner=self, tooltip="Start Mount Pyre Battle",
       position= gymButtonPos, rotation={0,0,0}, height=800, width=800, font_size=20000
   })
 end
 
+function deleteSave() 
+  leadersData = {}
+end
+
 function battle()
 
-  if gymData == nil then return end
+  if #leadersData == 0 then return end
+
+  local leaderIndex = math.random(1, #leadersData)
+  local leaderData = leadersData[leaderIndex]
 
   local params = {
-    trainerName = gymData.trainerName,
-    trainerGUID = gymData.guid,
+    trainerName = leaderData.trainerName,
+    trainerGUID = leaderData.guid,
     gymGUID = self.getGUID(),
-    isGymLeader = true,
-    isSilphCo = false,
+    isGymLeader = false,
+    isSilphCo = true,
     isRival = false,
     isElite4 = false,
-    pokemon = pokemonData
+    pokemon = leaderData.pokemon
   }
 
   local battleManager = getObjectFromGUID(battleManager)
@@ -46,41 +51,38 @@ function battle()
   if sentToArena then
     self.editButton({
         index=0, label="-", click_function="recall",
-        function_owner=self, tooltip="Recall Gym Leader",
-        position= gymButtonPos, rotation={0,0,0}, height=800, width=800, font_size=20000
+        function_owner=self, tooltip="Recall Mount Pyre Member"
     })
   end
 end
 
 function recall()
 
-  local params = {gymGUID = self.getGUID()}
-
   local battleManager = getObjectFromGUID(battleManager)
-  battleManager.call("recallGym", params)
+  battleManager.call("recallGym")
 
   Global.call("PlayRouteMusic",{})
 
   self.editButton({ --Apply settings button
       index=0, label="+", click_function="battle",
-      function_owner=self, tooltip="Start Gym Battle",
-      position= gymButtonPos, rotation={0,0,0}, height=800, width=800, font_size=20000
+      function_owner=self, tooltip="Start Mount Pyre Battle"
   })
 end
 
 function setLeaderGUID(params)
-
-  --print("setting gym leader guid")
-  --print(params[1])
   leaderGUID = params[1]
-  gymData = Global.call("GetGymDataByGUID", {guid=leaderGUID})
+  local gymData = Global.call("GetGymDataByGUID", {guid=leaderGUID})
 
-  pokemonData = {}
+  local leaderData = {guid= gymData.guid, trainerName= gymData.trainerName}
+  local pokemonData = {}
   for i=1, #gymData.pokemon do
     local newPokemon = {}
     setNewPokemon(newPokemon, gymData.pokemon[i])
     table.insert(pokemonData, newPokemon)
   end
+  leaderData.pokemon = pokemonData
+
+  table.insert(leadersData, leaderData)
 end
 
 function setNewPokemon(data, newPokemonData)
