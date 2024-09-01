@@ -18,8 +18,8 @@ function onLoad(saved_data)
 
   self.createButton({ --Apply settings button
       label="+", click_function="battle",
-      function_owner=self, tooltip="Start Mount Pyre Battle",
-      position= gymButtonPos, rotation={0,0,0}, height=800, width=800, font_size=20000
+      function_owner=self, tooltip="Start Silph Co Battle",
+      position= gymButtonPos, rotation={0,0,0}, height=700, width=700, font_size=18000
   })
 end
 
@@ -51,7 +51,7 @@ function battle()
   if sentToArena then
     self.editButton({
         index=0, label="-", click_function="recall",
-        function_owner=self, tooltip="Recall Mount Pyre Member"
+        function_owner=self, tooltip="Recall Silph Co Member"
     })
   end
 end
@@ -65,7 +65,7 @@ function recall()
 
   self.editButton({ --Apply settings button
       index=0, label="+", click_function="battle",
-      function_owner=self, tooltip="Start Mount Pyre Battle"
+      function_owner=self, tooltip="Start Silph Co Battle"
   })
 end
 
